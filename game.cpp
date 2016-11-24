@@ -192,11 +192,12 @@ namespace labb3{
 	}
 
 	void Game::handleDeath(){
-		std::cout<<_printer->printDead();
 		_currentRoom->move(&_player);
 		_player.setPosition(3,3);
 		_currentRoom = _rooms[0];
 		_currentRoom->addActor(&_player);
+		std::cout<<printScreen();
+		std::cout<<_printer->printDead();
 	}
 	
 	std::string Game::readCommand()const{
@@ -234,6 +235,7 @@ namespace labb3{
 			pickUp(appendSubArrayToString(words,1),actor);
 		}else if(commandMatches(words, {"go"}, 2)){
 			go(appendSubArrayToString(words,1),actor);
+			std::cout<<printScreen();
 		}else if(commandMatches(words, {"hit"}, 2)){
 			hit(appendSubArrayToString(words,1),actor);
 		}else if(commandMatches(words, {"look", "at"}, 3)){
@@ -243,14 +245,13 @@ namespace labb3{
 		}else if(commandMatches(words, {"talk", "to"}, 3)){
 			talkTo(appendSubArrayToString(words,2), actor);
 		}else if(commandMatches(words, {"help"},1) || commandMatches(words, {"h"},1) || commandMatches(words, {"?"},1)){
+			std::cout<<printScreen();
 			std::cout<<printCommands();
 		}else {
+			std::cout<<printScreen();
 			std::cout<<_printer->printCouldNotUnderstandCommand(originalCommand);
 			return false;
-		}
-	
-		
-		
+		}		
 	}
 	/*
 	 * Check if the command words matches our words, and if it has at least the right size. 
@@ -295,28 +296,36 @@ namespace labb3{
 				_currentRoom->removeItem(item);
 				std::string oldWeapon = d->changeWeapon(item);
 				_currentRoom->addItem(oldWeapon);
+				std::cout<<printScreen();
 				std::cout<<_printer->printPickedUpWeapon(actor, item, oldWeapon);
 				
 			}else if(w==nullptr && d!= nullptr){
 				d->healthUpgradeItem(item);
 				_currentRoom->removeItem(item);
+				std::cout<<printScreen();
 				std::cout<<_printer->printPickedUpItem(actor, item);
 			}
 			return true;
 		}else {
+			std::cout<<printScreen();
 			std::cout<<_printer->printCouldNotFindItem(item);
 			return false;
 		}
 	}
 	
 	bool Game::search(){
-		std::cout<<_printer->printRoomContent(_currentRoom, "search");
+
 		
 		DangerousRoom *d = dynamic_cast<DangerousRoom*>(_currentRoom);
 		if(d!=nullptr){
 			int damage = d->getDamage();
-			std::cout<<"You take damage from the dangerous spiders and rats lurking in the shadows. "<<std::endl;
 			_player.getHit(damage);
+			std::cout<<printScreen();
+			std::cout<<_printer->printRoomContent(_currentRoom, "search");
+			std::cout<<"You take damage from the dangerous spiders and rats lurking in the shadows. "<<std::endl;
+		}else {
+			std::cout<<printScreen();
+			std::cout<<_printer->printRoomContent(_currentRoom, "search");
 		}
 	}
 	
@@ -358,7 +367,6 @@ namespace labb3{
 				}
 				_currentRoom = next; 
 				Player* p = dynamic_cast<Player*>(actor);
-				//std::cout<<this->printScreen();
 			} else {
 				std::cout<<actor->getName()<<" left the area."<<std::endl;
 			}
@@ -378,7 +386,9 @@ namespace labb3{
 		if(a==nullptr && _currentRoom->getActors().size()==1) {
 			a = _currentRoom->getActors()[0];
 		}
-			
+
+		std::cout<<printScreen();
+		
 
 		if(a!=nullptr){
 			Dangerous* dan = dynamic_cast<Dangerous*>(a);
@@ -391,9 +401,9 @@ namespace labb3{
 				d->action(dan);
 				if(dan->getLife()==0){
 					if(acton.compare("player")!=0){
-						std::cout<<acton<<" died. Good job! He dropped his weapon. "<<std::endl;
 						_currentRoom->addItem(dan->getWeapon()); 
 						_currentRoom->removeActor(acton);
+						std::cout<<acton<<" died. Good job! He dropped his weapon. "<<std::endl;
 					}else{
 						
 					}
@@ -569,7 +579,7 @@ int main(){
 				game.update();
 			}
 			if(game.win) break;
-			std::cout<<game.printScreen();
+			//std::cout<<game.printScreen();
 			game.clearScreen();
 			command = game.readCommand();
 		}

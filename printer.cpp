@@ -100,9 +100,7 @@ namespace labb3{
 
 		string.append(this->printWorld(player));
 
-		std::string roomInfo = currentRoom->printContent();
-		string.append(roomInfo);
-		_numPrintedLines += findNumberOfLines(roomInfo);
+		string.append(printRoomContent(currentRoom));
 		return string;
 	}
 

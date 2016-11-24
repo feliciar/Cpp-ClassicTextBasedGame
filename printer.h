@@ -20,7 +20,7 @@ namespace labb3 {
 			std::string printDead();
 			std::string printGotHit(int damage);
 			std::string printCouldNotUnderstandCommand(std::string command);
-			std::string printRoomContent(Room * room, std::string command);
+			std::string printRoomContent(Room * room, std::string command="");
 		private: 
 			int findNumberOfLines(std::string string)const;
 			int getScreenWidth()const;
