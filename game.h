@@ -24,6 +24,7 @@ namespace labb3{
 			ItemFile * _item;
 			std::pair<Room*, Room*> _disapearingDoor; 
 			Printer * _printer;
+			std::string _eventDescriptions="";
 			
 		public: 
 			bool win = false;
@@ -42,7 +43,7 @@ namespace labb3{
 			bool search();
 			bool go(std::string, Actor*);
 			bool hit(std::string, Actor*);
-			bool lookAt(std::string)const;
+			bool lookAt(std::string);
 			bool sleep(std::string);
 			bool talkTo(std::string, Actor*);
 			void actRandom(Actor*);
@@ -51,6 +52,7 @@ namespace labb3{
 			std::string printCommands();
 			std::string printWorld();
 			std::string printScreen();
+			std::string printEvents();
 			void clearScreen();
 		private: 
 			bool commandMatches(std::vector<std::string> words, std::vector<std::string> commandToMatch, int wordCount)const;

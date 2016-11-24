@@ -186,7 +186,7 @@ namespace labb3{
 			handleDeath();
 		}
 		else if(endHealth<startHealth){
-			std::cout<<_printer->printGotHit(startHealth-endHealth);
+			_eventDescriptions.append(_printer->printGotHit(startHealth-endHealth));
 		}
 		
 	}
@@ -196,8 +196,7 @@ namespace labb3{
 		_player.setPosition(3,3);
 		_currentRoom = _rooms[0];
 		_currentRoom->addActor(&_player);
-		std::cout<<printScreen();
-		std::cout<<_printer->printDead();
+		_eventDescriptions.append(_printer->printDead());
 	}
 	
 	std::string Game::readCommand()const{
@@ -235,7 +234,6 @@ namespace labb3{
 			pickUp(appendSubArrayToString(words,1),actor);
 		}else if(commandMatches(words, {"go"}, 2)){
 			go(appendSubArrayToString(words,1),actor);
-			std::cout<<printScreen();
 		}else if(commandMatches(words, {"hit"}, 2)){
 			hit(appendSubArrayToString(words,1),actor);
 		}else if(commandMatches(words, {"look", "at"}, 3)){
@@ -245,11 +243,9 @@ namespace labb3{
 		}else if(commandMatches(words, {"talk", "to"}, 3)){
 			talkTo(appendSubArrayToString(words,2), actor);
 		}else if(commandMatches(words, {"help"},1) || commandMatches(words, {"h"},1) || commandMatches(words, {"?"},1)){
-			std::cout<<printScreen();
-			std::cout<<printCommands();
+			_eventDescriptions.append(printCommands());
 		}else {
-			std::cout<<printScreen();
-			std::cout<<_printer->printCouldNotUnderstandCommand(originalCommand);
+			_eventDescriptions.append(_printer->printCouldNotUnderstandCommand(originalCommand));
 			return false;
 		}		
 	}
@@ -296,19 +292,16 @@ namespace labb3{
 				_currentRoom->removeItem(item);
 				std::string oldWeapon = d->changeWeapon(item);
 				_currentRoom->addItem(oldWeapon);
-				std::cout<<printScreen();
-				std::cout<<_printer->printPickedUpWeapon(actor, item, oldWeapon);
+				_eventDescriptions.append(_printer->printPickedUpWeapon(actor, item, oldWeapon));
 				
 			}else if(w==nullptr && d!= nullptr){
 				d->healthUpgradeItem(item);
 				_currentRoom->removeItem(item);
-				std::cout<<printScreen();
-				std::cout<<_printer->printPickedUpItem(actor, item);
+				_eventDescriptions.append(_printer->printPickedUpItem(actor, item));
 			}
 			return true;
 		}else {
-			std::cout<<printScreen();
-			std::cout<<_printer->printCouldNotFindItem(item);
+			_eventDescriptions.append(_printer->printCouldNotFindItem(item));
 			return false;
 		}
 	}
@@ -320,14 +313,13 @@ namespace labb3{
 		if(d!=nullptr){
 			int damage = d->getDamage();
 			_player.getHit(damage);
-			std::cout<<printScreen();
-			std::cout<<_printer->printRoomContent(_currentRoom, "search");
-			std::cout<<"You take damage from the dangerous spiders and rats lurking in the shadows. "<<std::endl;
+			_eventDescriptions.append(_printer->printRoomContent(_currentRoom, "search"));
+			_eventDescriptions.append("You take damage from the dangerous spiders and rats lurking in the shadows. ");
 		}else {
-			std::cout<<printScreen();
-			std::cout<<_printer->printRoomContent(_currentRoom, "search");
+			_eventDescriptions.append(_printer->printRoomContent(_currentRoom, "search"));
 		}
 	}
+
 	
 	bool Game::go(std::string direction, Actor* actor){
 		Room* next = nullptr; 
@@ -363,17 +355,18 @@ namespace labb3{
 			if(actor->getName().compare("player")==0){
 				if(next==_disapearingDoor.second && _currentRoom==_disapearingDoor.first){
 					next->removeDoor(_currentRoom);
-					std::cout<<"You fell down a hole, and you can't get back up. "<<std::endl;
+					_eventDescriptions.append("You fell down a hole, and you can't get back up. ");
 				}
 				_currentRoom = next; 
 				Player* p = dynamic_cast<Player*>(actor);
 			} else {
-				std::cout<<actor->getName()<<" left the area."<<std::endl;
+				_eventDescriptions.append(actor->getName());
+				_eventDescriptions.append(" left the area.");
 			}
 			return true;
 		}else {
 			if(actor->getName().compare("player")==0)
-				std::cout<<"No path here"<<std::endl;
+				_eventDescriptions.append("No path here");
 			return false;	
 		}
 	}
@@ -385,25 +378,29 @@ namespace labb3{
 		Actor* a = _currentRoom->getActor(acton);
 		if(a==nullptr && _currentRoom->getActors().size()==1) {
 			a = _currentRoom->getActors()[0];
-		}
-
-		std::cout<<printScreen();
-		
+		}		
 
 		if(a!=nullptr){
 			Dangerous* dan = dynamic_cast<Dangerous*>(a);
 			//Player* pan = dynamic_cast<Player*>(a);
 			if(dan!=nullptr){
-				if(actoff->getName().compare("player")==0)
-					std::cout<<"You attacked "<<acton<<" with your "<<d->getWeapon()<<std::endl;
-				if(actoff->getName().compare("player")!=0&&acton.compare("player")!=0)
-					std::cout<<actoff->getName()<<" attacked "<<acton<<" with "<<d->getWeapon()<<std::endl;
+				if(actoff->getName().compare("player")==0){
+					std::stringstream s;
+					s<<"You attacked "<<acton<<" with your "<<d->getWeapon()<<std::endl;
+					_eventDescriptions.append(s.str());
+				}if(actoff->getName().compare("player")!=0&&acton.compare("player")!=0){
+					std::stringstream s;
+					s<<actoff->getName()<<" attacked "<<acton<<" with "<<d->getWeapon()<<std::endl;
+					_eventDescriptions.append(s.str());
+				}
 				d->action(dan);
 				if(dan->getLife()==0){
 					if(acton.compare("player")!=0){
 						_currentRoom->addItem(dan->getWeapon()); 
 						_currentRoom->removeActor(acton);
-						std::cout<<acton<<" died. Good job! He dropped his weapon. "<<std::endl;
+						std::stringstream s;
+						s<<acton<<" died. Good job! He dropped his weapon. "<<std::endl;
+						_eventDescriptions.append(s.str());
 					}else{
 						
 					}
@@ -411,28 +408,40 @@ namespace labb3{
 						win = true; 
 						return true;
 					}
-					if(actoff->getName().compare("player")==0)
-						std::cout<<"your new life: "<<d->getLife()<<" xp: "<<p->getXP()<<std::endl;
+					if(actoff->getName().compare("player")==0){
+						std::stringstream s;
+						s<<"your new life: "<<d->getLife()<<" xp: "<<p->getXP()<<std::endl;
+						_eventDescriptions.append(s.str());
+					}
 				}else{
-					if(acton.compare("player")!=0)
-						std::cout<<acton<<"'s new life is "<<dan->getLife()<<std::endl; 
+					if(acton.compare("player")!=0){
+						std::stringstream s;
+						s<<acton<<"'s new life is "<<dan->getLife()<<std::endl; 
+						_eventDescriptions.append(s.str());
+					}
 				}
 				return true;
 			}else{
-				if(actoff->getName().compare("player")==0)
-					std::cout<<"Could not attack "<<acton<<". It is friendly"<<std::endl;
+				if(actoff->getName().compare("player")==0){
+					std::stringstream s;
+					s<<"Could not attack "<<acton<<". It is friendly"<<std::endl;
+					_eventDescriptions.append(s.str());
+				}
 				return false;
 			}
 		}else{
-			if(actoff->getName().compare("player")==0)
-				std::cout<<"Could not find "<<acton<<" to attack. Did you write something wrong?"<<std::endl;
+			if(actoff->getName().compare("player")==0){
+				std::stringstream s;
+				s<<"Could not find "<<acton<<" to attack. Did you write something wrong?"<<std::endl;
+				_eventDescriptions.append(s.str());
+			}
 			return false;
 		}
 		
 		
 	}
 	
-	bool Game::lookAt(std::string item)const{
+	bool Game::lookAt(std::string item){
 		Item* i = _currentRoom->getItem(item);
 		Weapon* w = dynamic_cast<Weapon*>(i);
 		Actor* a = _currentRoom->getActor(item);
@@ -443,11 +452,14 @@ namespace labb3{
 			}else {
 				descStream<<*i<<std::endl;
 			}
-			std::cout<<descStream.str()<<std::endl;
+			_eventDescriptions.append(descStream.str());
 		}else if(a!=nullptr){
-			std::cout<<a->getDescription()<<std::endl;
+			_eventDescriptions.append(a->getDescription());
+			_eventDescriptions.append("\n");
 		}else {
-			std::cout<<"Could not find "<<item<<std::endl;
+			std::stringstream s;
+			s<<"Could not find "<<item<<std::endl;
+			_eventDescriptions.append(s.str());
 		}
 		
 	}
@@ -462,9 +474,13 @@ namespace labb3{
 		if(f!=nullptr){
 			f->action(actor);
 		} else if(a!=nullptr) {
-			std::cout<<"Can't talk to "<<text<<"."<<std::endl;
+			std::stringstream s;
+			s<<"Can't talk to "<<text<<"."<<std::endl;
+			_eventDescriptions.append(s.str());
 		} else {
-			std::cout<<"Can't find a "<<text<<" to talk to."<<std::endl;	
+			std::stringstream s;
+			s<<"Can't find a "<<text<<" to talk to."<<std::endl;
+			_eventDescriptions.append(s.str());	
 		}
 	}
 	
@@ -562,6 +578,12 @@ namespace labb3{
 	std::string Game::printWorld(){
 		return _printer->printWorld(&_player);
 	}
+
+	std::string Game::printEvents(){
+		std::string s = _eventDescriptions;
+		_eventDescriptions = "";
+		return s;
+	}
    
 }
 
@@ -579,7 +601,8 @@ int main(){
 				game.update();
 			}
 			if(game.win) break;
-			//std::cout<<game.printScreen();
+			std::cout<<game.printScreen();
+			std::cout<<game.printEvents();
 			game.clearScreen();
 			command = game.readCommand();
 		}
