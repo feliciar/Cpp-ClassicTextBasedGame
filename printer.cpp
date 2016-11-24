@@ -26,15 +26,23 @@ namespace labb3{
 	}
 
 	std::string Printer::printCommands(){
-		std::string printString =  "go [direction]\t to go somewhere\n";
+		std::string printString = "The available commands are: \n";
+		printString.append("go [direction]\t to go somewhere\n");
 		printString.append("hit [enemy]\t to attack something\n");
 		printString.append("pick up [item]\t to pick something up\n");
 		printString.append("look at [thing]\t to look closer at something, to find out more\n");
 		printString.append("talk to [friend] to talk to someone\n");
 		printString.append("search\t\t to see what is around you\n");
-		printString.append("sleep\t\t to rest and regain some health");
-		_numPrintedLines += 7;
+		printString.append("sleep\t\t to rest and regain some health\n");
+		_numPrintedLines += 8;
 		return printString;		
+	}
+
+	std::string Printer::printCouldNotUnderstandCommand(std::string command){
+		std::stringstream s; 
+		s<<"did not understand command "<<command<<std::endl;
+		++_numPrintedLines;
+		return s.str();
 	}
 
 
@@ -136,6 +144,18 @@ namespace labb3{
 		return descStream.str();
 	}
 
+	std::string Printer::printDead(){
+		_numPrintedLines += 2;
+		return "You died! \nThe next thing you remember is waking up at the ground next to the campfire. \n";
+	}
+
+	std::string Printer::printRoomContent(Room * room, std::string command){
+		std::string roomInfo = room->printContent(command);
+		roomInfo.append("\n");
+		_numPrintedLines += findNumberOfLines(roomInfo);
+		return roomInfo;
+	}
+
 	int Printer::findNumberOfLines(std::string string)const{
 		int numLines=0;
 		for(char& c : string) {
@@ -144,6 +164,13 @@ namespace labb3{
     		}
 		}
 		return numLines;
+	}
+
+	std::string Printer::printGotHit(int damage){
+		std::stringstream s; 
+		s<<"You got hit! You lost "<<damage<<" life.\n";
+		_numPrintedLines += 1;
+		return s.str();
 	}
 
 

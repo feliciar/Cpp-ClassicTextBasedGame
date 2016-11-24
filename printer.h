@@ -17,6 +17,10 @@ namespace labb3 {
 			std::string printPickedUpWeapon(Actor * actor, std::string item, std::string oldWeapon);
 			std::string printPickedUpItem(Actor * actor, std::string item);
 			std::string printCouldNotFindItem(std::string item);
+			std::string printDead();
+			std::string printGotHit(int damage);
+			std::string printCouldNotUnderstandCommand(std::string command);
+			std::string printRoomContent(Room * room, std::string command);
 		private: 
 			int findNumberOfLines(std::string string)const;
 			int getScreenWidth()const;

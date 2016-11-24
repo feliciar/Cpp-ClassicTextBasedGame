@@ -34,6 +34,7 @@ namespace labb3{
 			bool init();
 		
 			bool update();
+			void handleDeath();
 			std::string readCommand()const;
 			bool performCommand(std::string, Actor*);
 		
