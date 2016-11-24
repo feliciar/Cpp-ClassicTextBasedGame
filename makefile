@@ -1,4 +1,4 @@
-all : game clean
+all : game
 
 game :  game.o printer.o room.o weapon.o  player.o item.o friendly.o dangerous.o actor.o itemfile.o dangerousRoom.o friendlyRoom.o
 	g++ -g -o game printer.o itemfile.o game.o room.o weapon.o  player.o item.o friendly.o dangerous.o friendlyRoom.o dangerousRoom.o actor.o -std=c++11
@@ -39,5 +39,3 @@ dangerousRoom.o : dangerousRoom.cpp dangerousRoom.h
 friendlyRoom.o : friendlyRoom.cpp friendlyRoom.h
 	g++ -g -c           friendlyRoom.cpp -std=c++11
 	
-clean :
-	rm -f *.o game.o printer.o weapon.o room.o player.o item.o friendly.o dangerous.o actor.o itemfile.o dangerousRoom.o friendlyRoom.o
