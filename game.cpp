@@ -11,22 +11,6 @@
 #include "friendly.cpp"
 */
 namespace labb3{
-/*	
-	std::map<std::string, Item*> Game::getItems(){
-		static std::map<std::string, Item*> _items = {
-														{"axe",new Weapon("axe", "coolio axio",2)},
-														{"teeth",new Weapon("teeth", "sharp poisonous teeth", 10)},
-														{"gloves", new Weapon("gloves", "only dainty leather gloves", 1)},
-														{"fangs", new Weapon("fangs", "sharp fangs", 3)},
-														{"club", new Weapon("club", "heavy club", 3)},
-														{"sword", new Weapon("sword", "magical shiny stabby-sword", 10)},
-														{"big fangs", new Weapon("big fangs", "big sharp fangs", 5)},
-														{"health upgrade", new Item("health upgrade", "upgrades your health by 10")}
-														
-													};
-		return _items;
-	}
-*/
 
 	Game::Game(): _player(Player(20, "gloves")){
 		
@@ -45,35 +29,39 @@ namespace labb3{
 	}
 	
 	bool Game::init(){
+
+		_printer = new Printer();
+
 		_item = new ItemFile();
 		
-		//Starting room
-		Room* rstart = new FriendlyRoom("You are standing in a dark forest, with a crackling campfire in front of you."); 
-		rstart->addActor(&_player);
-		_rooms.push_back(rstart);		
+		Room* startRoom = new FriendlyRoom("You are standing in a dark forest, you see a light to the north. "); 
+		_rooms.push_back(startRoom);		
+
+		Room* campfire = new FriendlyRoom("You have a crackling campfire in front of you. You feel safe here."); 
+		_rooms.push_back(campfire);		
 		
-		Room* r11 = new FriendlyRoom("You are standing on a plateau over a small lake, with a waterfall in front of you.");
-		r11->addItem("axe");
-		_rooms.push_back(r11);
+		Room* plateau = new FriendlyRoom("You are standing on a plateau over a lake. You have a waterfall in front of you, and a forrest to the south.");
+		plateau->addItem("tooth brush");
+		_rooms.push_back(plateau);
 		
-		Room* r12 = new DangerousRoom("Both to the west and south you all you can se is dense forest. ");
+		Room* lakeShore = new DangerousRoom("You are standing on the lake shore. ");
 		Actor* a12 = new Dangerous("goblin", "Small filthy goblin", 2,"axe");
-		r12->addActor(a12);
-		_rooms.push_back(r12);
+		lakeShore->addActor(a12);
+		_rooms.push_back(lakeShore);
 		
-		Room* r21 = new DangerousRoom("You are standing on a forest path, water to the east. ");
+		Room* doubleGoblin = new DangerousRoom("A mountain rises right to the east, and the dense forrest is to the south. ");
 		Actor* a21 = new Dangerous("small goblin", "Smallish filthy goblin", 2,"axe");
 		Actor* a212 = new Dangerous("big goblin", "Smallish filthy goblin", 3,"axe");
-		r21->addActor(a21);
-		r21->addActor(a212);
-		_rooms.push_back(r21);
+		doubleGoblin->addActor(a21);
+		doubleGoblin->addActor(a212);
+		_rooms.push_back(doubleGoblin);
 		
-		Room* r22 = new DangerousRoom("");
+		Room* r22 = new DangerousRoom("You have water to the west, and a great stone wall rises to the east. You see a cave opening in the mountain. ");
 		Actor* a22 = new Dangerous("goblin", "Distgusting goblin", 5,"axe");
 		r22->addActor(a22);
 		_rooms.push_back(r22);
 		
-		Room* r31 = new DangerousRoom("A great stone wall is to the south of you. A cave opening to the north. ");
+		Room* r31 = new DangerousRoom("You are in a musky cave. The light is dim. ");
 		Actor* a31 = new Dangerous("puppy", "Dangerous threeheaded puppy", 10,"fangs");
 		r31->addActor(a31);
 		_rooms.push_back(r31);
@@ -81,12 +69,15 @@ namespace labb3{
 		Room* r32 = new DangerousRoom();
 		_rooms.push_back(r32);
 		
-		Room* r33 = new DangerousRoom();
+		Room* r33 = new DangerousRoom("You see great rocks. There is a small clift in the stone wall to the west. Maybe you can get through there...");
 		Actor* a33 = new Dangerous("troll", "troooollololo lo lolo lo lolo lo", 4,"club");
 		Actor* a332 = new Dangerous("goblin", "Distgusting goblin", 5,"axe");
 		r33->addActor(a33);
 		r33->addActor(a332);
 		_rooms.push_back(r33);
+
+		Room* narrowPath = new DangerousRoom();
+		_rooms.push_back(narrowPath);
 		
 		Room* r41 = new DangerousRoom();
 		r41->addItem("sword");
@@ -94,26 +85,16 @@ namespace labb3{
 		r41->addActor(a41);
 		_rooms.push_back(r41);
 		
-		Room* r51 = new DangerousRoom("You are in a big dark cave. ");
-		Actor* a51 = new Dangerous("cave troll", "don't feed the troll", 30,"club");
-		r51->addActor(a51);
-		_rooms.push_back(r51);
-		
-		Room* r52 = new DangerousRoom("There is a cave opening to the east of you. ");
-		_rooms.push_back(r52);
-		
 		Room* r53 = new FriendlyRoom();
 		Actor* a53 = new Friendly("wood elf", "'Some way along the path there is a mighty dragon! Come prepared if you want to live. ' says the wood elf");
 		r53->addActor(a53);
 		_rooms.push_back(r53);
-		
-		Room* r61 = new DangerousRoom();
-		Actor* a61 = new Dangerous("cerebous", "Like the puppy, but you know... bigger", 40,"big fangs");
-		r61->addActor(a61);
-		_rooms.push_back(r61);
+
+		Room* healthRoom = new FriendlyRoom();
+		healthRoom->addItem("health upgrade");
+		_rooms.push_back(healthRoom);
 		
 		Room* r62 = new DangerousRoom();
-		r62->addItem("health upgrade");
 		_rooms.push_back(r62);
 		
 		Room* r71 = new DangerousRoom("You are on a narrow stony path, with fire in the forest on both sides of you. ");
@@ -124,38 +105,64 @@ namespace labb3{
 		rend->addActor(aend);
 		_rooms.push_back(rend);
 		
+
+		/*
+		       ________
+		 _____|8 === 8 |_
+		|8  8  8 ~~~ 8  8|   
+		|8  8 ~~~ 8  8 |||
+		~~~~~~ 8  8  8 |
+		      444 8 444
+		      444444444
+
+
+		       ________
+		 _____|  ===   |_
+		|        ~~~     |   
+		|     ~~~      |||
+		~~~~~~         |
+		      444   444
+		      444444444
+
+		*/
+
 		//Adding doors
-		rstart->addDoor(1, r11);
-		rstart->addDoor(3, r12);
-		rstart->addDoor(0, r21);
+		startRoom->addDoor(0, campfire);
+
+		campfire->addDoor(3, plateau);
+		campfire->addDoor(0, lakeShore);
+		campfire->addDoor(1, doubleGoblin);
 		
-		r12->addDoor(0, r22);
+		lakeShore->addDoor(1, r32);
 		
-		r21->addDoor(3, r22);
-		r21->addDoor(0, r33);
-		r31->addDoor(0, r51);
-		r31->addDoor(3, r32);
+		doubleGoblin->addDoor(0, r32);
 		
-		r32->addDoor(0, r41);
+		r32->addDoor(0, r22);
 		
-		r32->addDoor(3, r33);
+		r22->addDoor(0, r33);
+		r22->addDoor(1, r31);
 		
-		r33->addDoor(0, r62);
+		r33->addDoor(3, narrowPath);
+		narrowPath->addDoor(3, r41);
 		
-		r41->addDoor(0, r52);
+		r41->addDoor(2, r53);
 		
-		r51->addDoor(3, r52);
-		r52->addDoor(3, r53);
-		r53->addDoor(0, r61);
-		r61->addDoor(3, r62);
-		r61->addDoor(0, r71);
-		r71->addDoor(0, rend);
+		r53->addDoor(3, r62);
+
+		r62->addDoor(2, r71);
+		r62->addDoor(3,healthRoom);
+
+		r71->addDoor(3, rend);
 		
-		_disapearingDoor.first = r61; 
+		_disapearingDoor.first = r62; 
 		_disapearingDoor.second = r71; 
 
 		
-		_currentRoom = rstart;
+		_currentRoom = startRoom;
+		//_currentRoom = r71;
+		startRoom->addActor(&_player);
+		//_currentRoom->addActor(&_player);
+		_player.setPosition(3,4);
 		
 	}
 
@@ -177,10 +184,10 @@ namespace labb3{
 		if(endHealth<=0){
 			std::cout<<"You died! \nThe next thing you remember is waking up at the ground next to the campfire. "<<std::endl;
 			_currentRoom->move(&_player);
+			_player.setPosition(3,3);
 			_currentRoom = _rooms[0];
 			_currentRoom->addActor(&_player);
-			std::cout<<_player<<std::endl;
-			std::cout<<_currentRoom->printContent()<<std::endl;
+			//std::cout<<this->printScreen();
 		}
 		else if(endHealth<startHealth){
 			std::cout<<"You got hit! You lost "<<startHealth-endHealth<<" life. Your current life is "<<endHealth<<std::endl;
@@ -285,24 +292,16 @@ namespace labb3{
 				_currentRoom->removeItem(item);
 				std::string oldWeapon = d->changeWeapon(item);
 				_currentRoom->addItem(oldWeapon);
-				if(actor->getName().compare("player")==0){
-					std::cout<<"You picked up "<<item<<" and left behind your old "<<oldWeapon<<std::endl;
-				} else {
-					std::cout<<actor->getName()<<" picked up "<<item<<" and left behind it's old "<<oldWeapon<<std::endl;
-				}
+				std::cout<<_printer->printPickedUpWeapon(actor, item, oldWeapon);
+				
 			}else if(w==nullptr && d!= nullptr){
 				d->healthUpgradeItem(item);
 				_currentRoom->removeItem(item);
-				if(actor->getName().compare("player")==0){
-					std::cout<<"You picked up "<<item<<" and increased your max health by 10"<<std::endl;
-				} else {
-					std::cout<<actor->getName()<<" picked up " <<item<<std::endl;
-					
-				}
+				std::cout<<_printer->printPickedUpItem(actor, item);
 			}
 			return true;
 		}else {
-			std::cout<<"Could not find item "<<item<<std::endl;
+			std::cout<<_printer->printCouldNotFindItem(item);
 			return false;
 		}
 	}
@@ -322,12 +321,24 @@ namespace labb3{
 		Room* next = nullptr; 
 		if(direction.compare("north")==0||direction.compare("n")==0){
 			next = _currentRoom->getConnectedRoom(0); 
+			if(next!=nullptr && actor->getName().compare("player")==0){
+				_player.setPosition(_player.getXPosition(), (_player.getYPosition()-1));
+			}
 		}else if(direction.compare("west")==0||direction.compare("w")==0){
 			next = _currentRoom->getConnectedRoom(3);
+			if(next!=nullptr && actor->getName().compare("player")==0){
+				_player.setPosition(_player.getXPosition()-1, (_player.getYPosition()));
+			}
 		}else if(direction.compare("south")==0||direction.compare("s")==0){
 			next = _currentRoom->getConnectedRoom(2);
+			if(next!=nullptr && actor->getName().compare("player")==0){
+				_player.setPosition(_player.getXPosition(), (_player.getYPosition()+1));
+			}
 		}else if(direction.compare("east")==0||direction.compare("e")==0){
 			next = _currentRoom->getConnectedRoom(1);
+			if(next!=nullptr && actor->getName().compare("player")==0){
+				_player.setPosition(_player.getXPosition()+1, (_player.getYPosition()));
+			}
 		}
 		if(next!=nullptr){
 			actor->move();
@@ -344,15 +355,14 @@ namespace labb3{
 				}
 				_currentRoom = next; 
 				Player* p = dynamic_cast<Player*>(actor);
-				std::cout<<*p<<std::endl;
-				std::cout<<_currentRoom->printContent();
+				//std::cout<<this->printScreen();
 			} else {
 				std::cout<<actor->getName()<<" left the area."<<std::endl;
 			}
 			return true;
 		}else {
 			if(actor->getName().compare("player")==0)
-				std::cout<<"No door here"<<std::endl;
+				std::cout<<"No path here"<<std::endl;
 			return false;	
 		}
 	}
@@ -362,6 +372,11 @@ namespace labb3{
 		Dangerous* d = dynamic_cast<Dangerous*>(actoff);
 		Player* p = dynamic_cast<Player*>(actoff);
 		Actor* a = _currentRoom->getActor(acton);
+		if(a==nullptr && _currentRoom->getActors().size()==1) {
+			a = _currentRoom->getActors()[0];
+		}
+			
+
 		if(a!=nullptr){
 			Dangerous* dan = dynamic_cast<Dangerous*>(a);
 			//Player* pan = dynamic_cast<Player*>(a);
@@ -395,9 +410,9 @@ namespace labb3{
 					std::cout<<"Could not attack "<<acton<<". It is friendly"<<std::endl;
 				return false;
 			}
-		}else  {
+		}else{
 			if(actoff->getName().compare("player")==0)
-				std::cout<<"Could not find "<<acton<<" to attack"<<std::endl;
+				std::cout<<"Could not find "<<acton<<" to attack. Did you write something wrong?"<<std::endl;
 			return false;
 		}
 		
@@ -512,34 +527,27 @@ namespace labb3{
 		return &_player;
 
 	}
-	
-	std::string Game::printWelcome()const{
-		std::string string = "";
-		std::stringstream descStream;
-		descStream<<_player<<std::endl;
-		string.append(descStream.str());
-		string.append("\nWelcome! \n");
-		string.append("With no recollection of where you are or who you are,\n");
-		string.append("you hear a distant roar to the north. \n");
-		
-		
-		
-		string.append("If you are confused just say 'help', or try to go somewhere. \n");
-		string.append(_currentRoom->printContent());
-		return string;
+
+	std::string Game::printWelcome(){
+		return _printer->printWelcome(&_player, _currentRoom);
+	}
+
+	std::string Game::printScreen(){
+		return _printer->printScreen(&_player, _currentRoom);
+	}
+
+	void Game::clearScreen(){
+		_printer->clearScreen();
 	}
 	
-	std::string Game::printCommands()const{
-		std::string printString =  "go [direction]\t to go somewhere\n";
-		printString.append("hit [enemy]\t to attack something\n");
-		printString.append("pick up [item]\t to pick something up\n");
-		printString.append("look at [thing]\t to look closer at something, to find out more\n");
-		printString.append("talk to [friend] to talk to someone\n");
-		printString.append("search\t\t to see what is around you\n");
-		printString.append("sleep\t\t to rest and regain some health");
-		return printString;
-		
-		
+	std::string Game::printCommands(){
+		return _printer->printCommands();
+	}
+	
+
+	
+	std::string Game::printWorld(){
+		return _printer->printWorld(&_player);
 	}
    
 }
@@ -547,23 +555,25 @@ namespace labb3{
 
 int main(){
 		
-		labb3::Game game; 
+		labb3::Game game;
 		game.init();
-		std::cout<<"###-------------###-------------###---------------------------------------------"<<std::endl;
-		std::cout<<game.printWelcome();
-		std::string command = ""; 
+		std::cout<<game.printScreen();
+		game.clearScreen();
+		std::string command = "";
 		command = game.readCommand();
 		while(command.compare("exit")!=0 && !game.win){
-			std::cout<<"###-------------###-------------###---------------------------------------------"<<std::endl;
 			if(game.performCommand(command, game.getPlayer()) && command.substr(0, 2).compare("go")!=0){
 				game.update();
 			}
 			if(game.win) break;
+			std::cout<<game.printScreen();
+			game.clearScreen();
 			command = game.readCommand();
 		}
 		if(game.win){
 			std::cout<<"You are the coolest! You defeated the great dragon. You are winner!!! "<<std::endl;
-		}
+			getline (std::cin, command);
+		}  
 		std::cout<<"Bye bye!"<<std::endl;
 }
 	

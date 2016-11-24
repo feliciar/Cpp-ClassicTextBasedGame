@@ -1,6 +1,8 @@
 
 #include "player.h"
  #include <typeinfo> 
+#include <iostream>
+#include <sstream>
 namespace labb3 {
 	Player::Player(int maxLife, std::string weapon) : Dangerous(maxLife, weapon){	
 		_name = "player";
@@ -41,10 +43,24 @@ namespace labb3 {
 		return _xp; 
 	}
 	
-	std::ostream & operator<<(std::ostream & os, Player const& p){
-		Weapon* wep = dynamic_cast<Weapon*>(ItemFile::getItems().find(p.getWeapon())->second);
-		os<<"LIFE: "<<p.getLife()<<" \tMAX LIFE: "<<p.getMaxHealth()<<" \tXP: "<<p.getXP()<<" \nWEAPON: "<<*wep;
-		return os;
+	std::string Player::printPlayerInfo()const{
+		Weapon* wep = dynamic_cast<Weapon*>(ItemFile::getItems().find(getWeapon())->second);
+		std::stringstream descStream;
+		descStream<<"LIFE: "<<getLife()<<" \tMAX LIFE: "<<getMaxHealth()<<" \tXP: "<<getXP()<<" \nWEAPON: "<<*wep;
+		return descStream.str();
+	}
+
+	void Player::setPosition(int x, int y){
+		_xPosition = x; 
+		_yPosition = y;
+	}
+
+	int Player::getXPosition()const{
+		return _xPosition;
+	}
+
+	int Player::getYPosition()const{
+		return _yPosition;
 	}
 	
 }

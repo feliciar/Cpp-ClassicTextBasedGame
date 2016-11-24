@@ -10,6 +10,7 @@
 #include "friendly.h"
 #include "dangerousRoom.h"
 #include "friendlyRoom.h"
+#include "printer.h"
 #include <vector>
 #include <map>
 
@@ -22,6 +23,7 @@ namespace labb3{
 			std::vector<Room*> _rooms;
 			ItemFile * _item;
 			std::pair<Room*, Room*> _disapearingDoor; 
+			Printer * _printer;
 			
 		public: 
 			bool win = false;
@@ -44,8 +46,11 @@ namespace labb3{
 			bool talkTo(std::string, Actor*);
 			void actRandom(Actor*);
 			Player* getPlayer();
-			std::string printWelcome()const;
-			std::string printCommands()const;
+			std::string printWelcome();
+			std::string printCommands();
+			std::string printWorld();
+			std::string printScreen();
+			void clearScreen();
 		private: 
 			bool commandMatches(std::vector<std::string> words, std::vector<std::string> commandToMatch, int wordCount)const;
 			std::string appendSubArrayToString(std::vector<std::string> array, int position)const;
