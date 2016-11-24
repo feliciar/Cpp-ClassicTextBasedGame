@@ -7,7 +7,8 @@ namespace labb3 {
 		protected: 
 			bool _hidden = false;
 			std::string _name ="";
-			std::string _description="";			
+			std::string _description="";		
+		
 		public:
 			virtual ~Actor();
 			virtual bool action(Actor* other) = 0;
@@ -19,6 +20,7 @@ namespace labb3 {
 			void setName(std::string name);
 			void setDescription(std::string desc);
 			void setHidden(bool hidden);
+
 	};
 	
 	std::ostream & operator<<(std::ostream & os, Actor const &);

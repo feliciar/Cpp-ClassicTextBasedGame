@@ -27,5 +27,6 @@ namespace labb3 {
 		os<<actor.getName();
 		return os;
 	}
+
 }
 
