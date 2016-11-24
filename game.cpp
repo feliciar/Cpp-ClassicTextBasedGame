@@ -553,8 +553,8 @@ namespace labb3{
 }
 
 
+
 int main(){
-		
 		labb3::Game game;
 		game.init();
 		std::cout<<game.printScreen();

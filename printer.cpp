@@ -4,7 +4,9 @@
 
 namespace labb3{
 
-
+	Printer::Printer(){
+		_numPrintedLines = 0;
+	}
 
 	std::string Printer::printWelcome(const Player * player, Room * currentRoom){
 		_numPrintedLines = 0;
@@ -70,18 +72,33 @@ namespace labb3{
 	}
 
 	std::string Printer::printScreen(const Player * player, Room * currentRoom){
-		std::string string ="###------------###------------###------------###------------###------------###\n";
-		std::stringstream descStream;
-		descStream<<player->printPlayerInfo()<<std::endl;
-		string.append(descStream.str());
+		int screenWidth = getScreenWidth();
+		std::string string= ""; 
+		for(int i=0; i<screenWidth-1; ++i){
+			if(i%10==0 || (i-1)%10==0 || (i-2)%10==0){
+				string.append("#");
+			}else{
+				string.append("-");
+			}
+		}
+		string.append("\n");
+		++_numPrintedLines;
+		
+		std::string playerInfo = player->printPlayerInfo();
+		playerInfo.append("\n");
+		string.append(playerInfo);
+		_numPrintedLines += findNumberOfLines(playerInfo);
+
 		string.append(this->printWorld(player));
-		string.append(currentRoom->printContent());
-		_numPrintedLines += 3;
+
+		std::string roomInfo = currentRoom->printContent();
+		string.append(roomInfo);
+		_numPrintedLines += findNumberOfLines(roomInfo);
 		return string;
 	}
 
 	void Printer::clearScreen(){
-		int newLines = 22-_numPrintedLines;
+		int newLines = getScreenHeight()-_numPrintedLines-1;
 		_numPrintedLines = 0;
 		for(int i=0; i<newLines; ++i){
 			std::cout<<""<<std::endl;
@@ -125,7 +142,28 @@ namespace labb3{
     			++numLines;
     		}
 		}
+		return numLines;
 	}
+
+	#include <windows.h>
+
+
+	int Printer::getScreenWidth()const{
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		int columns;
+	    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+	    columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+		return columns;
+	}
+
+	int Printer::getScreenHeight()const{
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		int rows;
+	    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+	    rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+	    return rows;
+	}
+
 
 
 

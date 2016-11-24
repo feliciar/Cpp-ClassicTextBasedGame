@@ -8,6 +8,7 @@ namespace labb3 {
 		
 		int _numPrintedLines;
 		public:
+			Printer();
 			std::string printScreen(const Player * player, Room * currentRoom);
 			void clearScreen();
 			std::string printWelcome(const Player * player, Room * currentRoom);
@@ -18,6 +19,8 @@ namespace labb3 {
 			std::string printCouldNotFindItem(std::string item);
 		private: 
 			int findNumberOfLines(std::string string)const;
+			int getScreenWidth()const;
+			int getScreenHeight()const;
 	};
 	
 }
