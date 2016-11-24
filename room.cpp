@@ -128,13 +128,13 @@ namespace labb3{
 			
 		}
 		if(_doors[0]!=nullptr)
-			descStream<<"Door To The North"<<std::endl;
+			descStream<<"Path To The North"<<std::endl;
 		if(_doors[1]!=nullptr)
-			descStream<<"Door To The East"<<std::endl;
+			descStream<<"Path To The East"<<std::endl;
 		if(_doors[2]!=nullptr)
-			descStream<<"Door To The South"<<std::endl;
+			descStream<<"Path To The South"<<std::endl;
 		if(_doors[3]!=nullptr)
-			descStream<<"Door To The West"<<std::endl;
+			descStream<<"Path To The West"<<std::endl;
 				
 		return descStream.str();
 	}

@@ -6,6 +6,7 @@ namespace labb3{
 			{"axe",new Weapon("axe", "coolio axio",2)},
 			{"teeth",new Weapon("teeth", "sharp poisonous teeth", 10)},
 			{"gloves", new Weapon("gloves", "only dainty leather gloves", 1)},
+			{"tooth brush", new Weapon("tooth brush", "a small toothbrush", 2)},
 			{"fangs", new Weapon("fangs", "sharp fangs", 3)},
 			{"club", new Weapon("club", "heavy club", 3)},
 			{"sword", new Weapon("sword", "magical shiny stabby-sword", 10)},
