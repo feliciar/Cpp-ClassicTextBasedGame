@@ -194,7 +194,7 @@ namespace labb3{
 	void Game::handleDeath(){
 		_currentRoom->move(&_player);
 		_player.setPosition(3,3);
-		_currentRoom = _rooms[0];
+		_currentRoom = _rooms[1];
 		_currentRoom->addActor(&_player);
 		_eventDescriptions.append(_printer->printDead());
 	}
@@ -310,14 +310,12 @@ namespace labb3{
 
 		
 		DangerousRoom *d = dynamic_cast<DangerousRoom*>(_currentRoom);
-		if(d!=nullptr){
+		bool isDangerousRoom = d!=nullptr;
+		if(isDangerousRoom){
 			int damage = d->getDamage();
 			_player.getHit(damage);
-			_eventDescriptions.append(_printer->printRoomContent(_currentRoom, "search"));
-			_eventDescriptions.append("You take damage from the dangerous spiders and rats lurking in the shadows. ");
-		}else {
-			_eventDescriptions.append(_printer->printRoomContent(_currentRoom, "search"));
 		}
+		_printer->printSearch(isDangerousRoom, _currentRoom);
 	}
 
 	
@@ -371,69 +369,59 @@ namespace labb3{
 		}
 	}
 	
-	bool Game::hit(std::string acton, Actor* actoff){
+	bool Game::hit(std::string targetName, Actor* attacker){
 		
-		Dangerous* d = dynamic_cast<Dangerous*>(actoff);
-		Player* p = dynamic_cast<Player*>(actoff);
-		Actor* a = _currentRoom->getActor(acton);
+		Dangerous* d = dynamic_cast<Dangerous*>(attacker);
+		Player* p = dynamic_cast<Player*>(attacker);
+		Actor* a = _currentRoom->getActor(targetName);
 		if(a==nullptr && _currentRoom->getActors().size()==1) {
 			a = _currentRoom->getActors()[0];
 		}		
 
 		if(a!=nullptr){
 			Dangerous* dan = dynamic_cast<Dangerous*>(a);
-			//Player* pan = dynamic_cast<Player*>(a);
 			if(dan!=nullptr){
-				if(actoff->getName().compare("player")==0){
-					std::stringstream s;
-					s<<"You attacked "<<acton<<" with your "<<d->getWeapon()<<std::endl;
-					_eventDescriptions.append(s.str());
-				}if(actoff->getName().compare("player")!=0&&acton.compare("player")!=0){
-					std::stringstream s;
-					s<<actoff->getName()<<" attacked "<<acton<<" with "<<d->getWeapon()<<std::endl;
-					_eventDescriptions.append(s.str());
-				}
+				_eventDescriptions.append( _printer->printAttacked(attacker->getName(), targetName, d->getWeapon()) );
+				
 				d->action(dan);
 				if(dan->getLife()==0){
-					if(acton.compare("player")!=0){
+					if(targetName.compare("player")!=0){
 						_currentRoom->addItem(dan->getWeapon()); 
-						_currentRoom->removeActor(acton);
+						_currentRoom->removeActor(targetName);
 						std::stringstream s;
-						s<<acton<<" died. Good job! He dropped his weapon. "<<std::endl;
-						_eventDescriptions.append(s.str());
-					}else{
-						
+						s<<targetName<<" died. Good job! He dropped his weapon. "<<std::endl;
+						_eventDescriptions.append(_printer->printString(s.str()));
 					}
-					if(acton.compare("dragon")==0){
+					if(targetName.compare("dragon")==0){
 						win = true; 
 						return true;
 					}
-					if(actoff->getName().compare("player")==0){
+					if(attacker->getName().compare("player")==0){
 						std::stringstream s;
 						s<<"your new life: "<<d->getLife()<<" xp: "<<p->getXP()<<std::endl;
-						_eventDescriptions.append(s.str());
+						_eventDescriptions.append(_printer->printString(s.str()));
 					}
 				}else{
-					if(acton.compare("player")!=0){
+					if(targetName.compare("player")!=0){
 						std::stringstream s;
-						s<<acton<<"'s new life is "<<dan->getLife()<<std::endl; 
-						_eventDescriptions.append(s.str());
+						s<<targetName<<"'s new life is "<<dan->getLife()<<std::endl; 
+						_eventDescriptions.append(_printer->printString(s.str()));
 					}
 				}
 				return true;
 			}else{
-				if(actoff->getName().compare("player")==0){
+				if(attacker->getName().compare("player")==0){
 					std::stringstream s;
-					s<<"Could not attack "<<acton<<". It is friendly"<<std::endl;
-					_eventDescriptions.append(s.str());
+					s<<"Could not attack "<<targetName<<". It is friendly"<<std::endl;
+					_eventDescriptions.append(_printer->printString(s.str()));
 				}
 				return false;
 			}
 		}else{
-			if(actoff->getName().compare("player")==0){
+			if(attacker->getName().compare("player")==0){
 				std::stringstream s;
-				s<<"Could not find "<<acton<<" to attack. Did you write something wrong?"<<std::endl;
-				_eventDescriptions.append(s.str());
+				s<<"Could not find "<<targetName<<" to attack. Did you write something wrong?"<<std::endl;
+				_eventDescriptions.append(_printer->printString(s.str()));
 			}
 			return false;
 		}

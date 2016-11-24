@@ -21,6 +21,10 @@ namespace labb3 {
 			std::string printGotHit(int damage);
 			std::string printCouldNotUnderstandCommand(std::string command);
 			std::string printRoomContent(Room * room, std::string command="");
+			std::string printSearch(bool isDangerousRoom, Room * room);
+			std::string printHit(std::string targetName, Actor * attacker);
+			std::string printAttacked(std::string attacker, std::string target, std::string weapon);
+			std::string printString(std::string string);
 		private: 
 			int findNumberOfLines(std::string string)const;
 			int getScreenWidth()const;

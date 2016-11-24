@@ -171,6 +171,39 @@ namespace labb3{
 		return s.str();
 	}
 
+	std::string Printer::printSearch(bool isDangerousRoom, Room * room){
+		std::string string="";
+		if(isDangerousRoom){
+			string.append(printRoomContent(room, "search"));
+			string.append("You take damage from the dangerous spiders and rats lurking in the shadows. \n");
+			++_numPrintedLines;
+		}else {
+			string.append(printRoomContent(room, "search"));
+		}
+		return string;
+	}
+
+	std::string Printer::printHit(std::string targetName, Actor * attacker){
+
+	}
+
+	std::string Printer::printAttacked(std::string attacker, std::string target, std::string weapon){
+		std::stringstream s;
+		if(attacker.compare("player")==0){
+			s<<"You attacked "<<target<<" with your "<<weapon<<std::endl;
+		}
+		else if ( target.compare("player")!=0){
+			s<<attacker<<" attacked "<<target<<" with "<<weapon<<std::endl;
+		}
+		++_numPrintedLines;
+		return s.str();
+	}
+
+	std::string Printer::printString(std::string string){
+		_numPrintedLines += findNumberOfLines(string);
+		return string;
+	}
+
 
 
 	int Printer::getScreenWidth()const{
