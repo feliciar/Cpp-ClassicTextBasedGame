@@ -1,6 +1,7 @@
 #include "printer.h"
 #include <iostream>
 #include <sstream>
+#include <windows.h>
 
 namespace labb3{
 
@@ -145,7 +146,6 @@ namespace labb3{
 		return numLines;
 	}
 
-	#include <windows.h>
 
 
 	int Printer::getScreenWidth()const{
