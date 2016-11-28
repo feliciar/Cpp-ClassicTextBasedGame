@@ -7,6 +7,7 @@ namespace labb3{
 
 	Printer::Printer(){
 		_numPrintedLines = 0;
+		_operatingSystem = getOS();
 	}
 
 	std::string Printer::printWelcome(const Player * player, Room * currentRoom){
@@ -25,26 +26,37 @@ namespace labb3{
 		return string;
 	}
 
-	std::string Printer::printCommands(){
-		std::string printString = "The available commands are: \n";
-		printString.append("go [direction]\t to go somewhere\n");
-		printString.append("hit [enemy]\t to attack something\n");
-		printString.append("pick up [item]\t to pick something up\n");
-		printString.append("look at [thing]\t to look closer at something, to find out more\n");
-		printString.append("talk to [friend] to talk to someone\n");
-		printString.append("search\t\t to see what is around you\n");
-		printString.append("sleep\t\t to rest and regain some health\n");
-		_numPrintedLines += 8;
-		return printString;		
-	}
-
-	std::string Printer::printCouldNotUnderstandCommand(std::string command){
-		std::stringstream s; 
-		s<<"did not understand command "<<command<<std::endl;
+	std::string Printer::printScreen(const Player * player, Room * currentRoom){
+		int screenWidth = getScreenWidth();
+		std::string string= ""; 
+		for(int i=0; i<screenWidth-1; ++i){
+			if(i%10==0 || (i-1)%10==0 || (i-2)%10==0){
+				string.append("#");
+			}else{
+				string.append("-");
+			}
+		}
+		string.append("\n");
 		++_numPrintedLines;
-		return s.str();
+		
+		std::string playerInfo = player->printPlayerInfo();
+		playerInfo.append("\n");
+		string.append(playerInfo);
+		_numPrintedLines += findNumberOfLines(playerInfo);
+
+		string.append(this->printWorld(player));
+
+		string.append(printRoomContent(currentRoom));
+		return string;
 	}
 
+	void Printer::clearScreen(){
+		int newLines = getScreenHeight()-_numPrintedLines-1;
+		_numPrintedLines = 0;
+		for(int i=0; i<newLines; ++i){
+			std::cout<<""<<std::endl;
+		}	
+	}
 
 	/*
 			       ________   
@@ -80,39 +92,6 @@ namespace labb3{
 		return str;
 	}
 
-	std::string Printer::printScreen(const Player * player, Room * currentRoom){
-		int screenWidth = getScreenWidth();
-		std::string string= ""; 
-		for(int i=0; i<screenWidth-1; ++i){
-			if(i%10==0 || (i-1)%10==0 || (i-2)%10==0){
-				string.append("#");
-			}else{
-				string.append("-");
-			}
-		}
-		string.append("\n");
-		++_numPrintedLines;
-		
-		std::string playerInfo = player->printPlayerInfo();
-		playerInfo.append("\n");
-		string.append(playerInfo);
-		_numPrintedLines += findNumberOfLines(playerInfo);
-
-		string.append(this->printWorld(player));
-
-		string.append(printRoomContent(currentRoom));
-		return string;
-	}
-
-	void Printer::clearScreen(){
-		int newLines = getScreenHeight()-_numPrintedLines-1;
-		_numPrintedLines = 0;
-		for(int i=0; i<newLines; ++i){
-			std::cout<<""<<std::endl;
-		}
-		
-	}
-
 	std::string Printer::printPickedUpWeapon(Actor * actor, std::string item, std::string oldWeapon){
 		std::stringstream descStream;
 		if(actor->getName().compare("player")==0){
@@ -142,28 +121,6 @@ namespace labb3{
 		return descStream.str();
 	}
 
-	std::string Printer::printDead(){
-		_numPrintedLines += 2;
-		return "You died! \nThe next thing you remember is waking up at the ground next to the campfire. \n";
-	}
-
-	std::string Printer::printRoomContent(Room * room, std::string command){
-		std::string roomInfo = room->printContent(command);
-		roomInfo.append("\n");
-		_numPrintedLines += findNumberOfLines(roomInfo);
-		return roomInfo;
-	}
-
-	int Printer::findNumberOfLines(std::string string)const{
-		int numLines=0;
-		for(char& c : string) {
-    		if(c=='\n'){
-    			++numLines;
-    		}
-		}
-		return numLines;
-	}
-
 	std::string Printer::printGotHit(int damage){
 		std::stringstream s; 
 		s<<"You got hit! You lost "<<damage<<" life.\n";
@@ -171,16 +128,9 @@ namespace labb3{
 		return s.str();
 	}
 
-	std::string Printer::printSearch(bool isDangerousRoom, Room * room){
-		std::string string="";
-		if(isDangerousRoom){
-			string.append(printRoomContent(room, "search"));
-			string.append("You take damage from the dangerous spiders and rats lurking in the shadows. \n");
-			++_numPrintedLines;
-		}else {
-			string.append(printRoomContent(room, "search"));
-		}
-		return string;
+	std::string Printer::printDead(){
+		_numPrintedLines += 2;
+		return "You died! \nThe next thing you remember is waking up at the ground next to the campfire. \n";
 	}
 
 	std::string Printer::printHit(std::string targetName, Actor * attacker){
@@ -199,27 +149,97 @@ namespace labb3{
 		return s.str();
 	}
 
+	std::string Printer::printRoomContent(Room * room, std::string command){
+		std::string roomInfo = room->printContent(command);
+		roomInfo.append("\n");
+		_numPrintedLines += findNumberOfLines(roomInfo);
+		return roomInfo;
+	}
+
+	std::string Printer::printSearch(bool isDangerousRoom, Room * room){
+		std::string string="";
+		if(isDangerousRoom){
+			string.append(printRoomContent(room, "search"));
+			string.append("You take damage from the dangerous spiders and rats lurking in the shadows. \n");
+			++_numPrintedLines;
+		}else {
+			string.append(printRoomContent(room, "search"));
+		}
+		return string;
+	}
+
+	std::string Printer::printCommands(){
+		std::string printString = "The available commands are: \n";
+		printString.append("go [direction]\t to go somewhere\n");
+		printString.append("hit [enemy]\t to attack something\n");
+		printString.append("pick up [item]\t to pick something up\n");
+		printString.append("look at [thing]\t to look closer at something, to find out more\n");
+		printString.append("talk to [friend] to talk to someone\n");
+		printString.append("search\t\t to see what is around you\n");
+		printString.append("sleep\t\t to rest and regain some health\n");
+		_numPrintedLines += 8;
+		return printString;		
+	}
+
+	std::string Printer::printCouldNotUnderstandCommand(std::string command){
+		std::stringstream s; 
+		s<<"did not understand command "<<command<<std::endl;
+		++_numPrintedLines;
+		return s.str();
+	}
+
+
 	std::string Printer::printString(std::string string){
 		_numPrintedLines += findNumberOfLines(string);
 		return string;
 	}
 
-
+	int Printer::findNumberOfLines(std::string string)const{
+		int numLines=0;
+		for(char& c : string) {
+    		if(c=='\n'){
+    			++numLines;
+    		}
+		}
+		return numLines;
+	}
 
 	int Printer::getScreenWidth()const{
-		CONSOLE_SCREEN_BUFFER_INFO csbi;
-		int columns;
-	    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-	    columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+		int columns = 20;
+		if(_operatingSystem.compare("Windows")==0){
+			CONSOLE_SCREEN_BUFFER_INFO csbi;
+		    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+		    columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+		}
 		return columns;
 	}
 
 	int Printer::getScreenHeight()const{
-		CONSOLE_SCREEN_BUFFER_INFO csbi;
-		int rows;
-	    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-	    rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+		int rows = 10;
+		if(_operatingSystem.compare("Windows")==0){
+			CONSOLE_SCREEN_BUFFER_INFO csbi;
+		    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+		    rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+		}
 	    return rows;
+	}
+
+	std::string Printer::getOS()const{
+	    #ifdef _WIN32
+	    	return "Windows";
+	    #elif defined(_WIN64)
+	    	return "Windows";
+	    #elif __unix || __unix__
+	    	return "Unix";
+	    #elif __APPLE__ || __MACH__
+	    	return "Mac OSX";
+	    #elif __linux__
+	    	return "Linux";
+	    #elif __FreeBSD__
+	    	return "FreeBSD";
+	    #else
+	    	return "Other";
+	    #endif
 	}
 
 

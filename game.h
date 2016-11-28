@@ -11,6 +11,7 @@
 #include "dangerousRoom.h"
 #include "friendlyRoom.h"
 #include "printer.h"
+#include "worldData.h"
 #include <vector>
 #include <map>
 
