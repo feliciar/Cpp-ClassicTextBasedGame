@@ -19,7 +19,7 @@ namespace labb3 {
 			void setPosition(int x, int y);
 			int getXPosition()const;
 			int getYPosition()const;
-			std::string printPlayerInfo()const;
+
 	};
 }
 

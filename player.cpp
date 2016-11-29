@@ -43,12 +43,7 @@ namespace labb3 {
 		return _xp; 
 	}
 	
-	std::string Player::printPlayerInfo()const{
-		Weapon* wep = dynamic_cast<Weapon*>(ItemFile::getItems().find(getWeapon())->second);
-		std::stringstream descStream;
-		descStream<<"LIFE: "<<getLife()<<" \tMAX LIFE: "<<getMaxHealth()<<" \tXP: "<<getXP()<<" \nWEAPON: "<<*wep;
-		return descStream.str();
-	}
+	
 
 	void Player::setPosition(int x, int y){
 		_xPosition = x; 

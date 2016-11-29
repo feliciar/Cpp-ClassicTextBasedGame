@@ -15,6 +15,7 @@ namespace labb3 {
 			void clearScreen();
 			
 			std::string printWorld(const Player * player);
+			std::string printPlayer(const Player * player);
 			std::string printPickedUpWeapon(Actor * actor, std::string item, std::string oldWeapon);
 			std::string printPickedUpItem(Actor * actor, std::string item);
 			std::string printCouldNotFindItem(std::string item);
@@ -32,6 +33,7 @@ namespace labb3 {
 			int getScreenWidth()const;
 			int getScreenHeight()const;
 			std::string getOS()const;
+			void setupConsole()const;
 	};
 	
 }

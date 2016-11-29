@@ -2,17 +2,20 @@
 #include <iostream>
 #include <sstream>
 #include <windows.h>
+#include <locale>
 
 namespace labb3{
 
 	Printer::Printer(){
 		_numPrintedLines = 0;
+		
 		_operatingSystem = getOS();
+		//setupConsole();
 	}
 
 	std::string Printer::printWelcome(const Player * player, Room * currentRoom){
 		_numPrintedLines = 0;
-		std::string string = player->printPlayerInfo();
+		std::string string = printPlayer(player);
 		_numPrintedLines += findNumberOfLines(string);
 		string.append("\nWelcome! \n");
 		string.append("With no recollection of where you are or who you are,\n");
@@ -39,7 +42,7 @@ namespace labb3{
 		string.append("\n");
 		++_numPrintedLines;
 		
-		std::string playerInfo = player->printPlayerInfo();
+		std::string playerInfo = printPlayer(player);
 		playerInfo.append("\n");
 		string.append(playerInfo);
 		_numPrintedLines += findNumberOfLines(playerInfo);
@@ -92,10 +95,17 @@ namespace labb3{
 		return str;
 	}
 
+	std::string Printer::printPlayer(const Player * player){
+		Weapon* wep = dynamic_cast<Weapon*>(ItemFile::getItems().find(player->getWeapon())->second);
+		std::stringstream descStream;
+		descStream<<player->getLife()<<"/"<<player->getMaxHealth()<<" <3 "<<" \t"<<player->getXP()<<" XP"<<" \t\tWEAPON: "<<*wep;
+		return descStream.str();
+	}
+
 	std::string Printer::printPickedUpWeapon(Actor * actor, std::string item, std::string oldWeapon){
 		std::stringstream descStream;
 		if(actor->getName().compare("player")==0){
-			descStream<<"You picked up "<<item<<" and left behind your old "<<oldWeapon<<std::endl;
+			//descStream<<"You picked up "<<item<<" and left behind your old "<<oldWeapon<<std::endl;
 		} else {
 			descStream<<actor->getName()<<" picked up "<<item<<" and left behind it's old "<<oldWeapon<<std::endl;
 		}
@@ -140,7 +150,7 @@ namespace labb3{
 	std::string Printer::printAttacked(std::string attacker, std::string target, std::string weapon){
 		std::stringstream s;
 		if(attacker.compare("player")==0){
-			s<<"You attacked "<<target<<" with your "<<weapon<<std::endl;
+			//s<<"You attacked "<<target<<" with your "<<weapon<<std::endl;
 		}
 		else if ( target.compare("player")!=0){
 			s<<attacker<<" attacked "<<target<<" with "<<weapon<<std::endl;
@@ -240,6 +250,49 @@ namespace labb3{
 	    #else
 	    	return "Other";
 	    #endif
+	}
+
+	void Printer::setupConsole()const{
+
+
+		if(_operatingSystem.compare("Windows")==0){
+			SetConsoleCP(CP_UTF8);
+			SetConsoleOutputCP(CP_UTF8);
+
+
+			CONSOLE_FONT_INFOEX cfix;
+	        cfix.cbSize       = sizeof(cfix);
+	        cfix.nFont        = 12;
+	        cfix.dwFontSize.X = 8;
+	        cfix.dwFontSize.Y = 14;
+	        cfix.FontFamily   = FF_DONTCARE;
+	        cfix.FontWeight   = 400;  // normal weight
+	        //lstrcpy(cfix.FaceName, TEXT("Lucida Console"));
+
+			//SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), false, &cfix);
+		}
+		char ex = '\3';
+
+		std::cout<<ex<<std::endl;
+		std::cout<< "♥" << std::endl;
+		std::cout<< " "<<std::endl;
+		std::cout<<"\u2665"<<std::endl;
+
+		const char heart[] = "\xe2\x99\xa5";
+		std::cout<<heart<<std::endl;
+
+		wchar_t h[] = L"\u2665";
+		setlocale(LC_ALL, "");
+    	std::wcout << heart << L'\n';
+
+    	std::cout<<(char)3<<std::endl;
+    	std::cout <<(char)6<<std::endl;
+    	std::cout<<"\u9829"<<std::endl;
+		//if (IsValidCodePage(CP_UTF8))
+		//	std::cout<<"Good"<<std::endl;
+
+
+
 	}
 
 
