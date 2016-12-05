@@ -6,9 +6,11 @@ namespace labb3 {
 	std::string Actor::getName()const{
 		return _name;
 	}
+
 	std::string Actor::getDescription()const{
 		return _description;
 	}
+
 	
 	bool Actor::getHidden()const{
 		return _hidden;

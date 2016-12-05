@@ -11,6 +11,7 @@ namespace labb3{
 		
 		virtual ~FriendlyRoom();
 		virtual bool interact(Actor* player);
+		virtual bool isFriendly();
 	};
 	
 }

@@ -33,10 +33,10 @@ namespace labb3 {
 	}
 	
 	bool Player::move(){
-		if(_life+1<=_maxLife){
+		/*if(_life+1<=_maxLife){
 			_life+=1;
 			std::cout<<"Replenished some of your health"<<std::endl;
-		}		
+		}*/		
 	}
 	
 	int Player::getXP()const{

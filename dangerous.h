@@ -35,6 +35,7 @@ namespace labb3 {
 			int getLife()const;
 			
 			std::string getWeapon()const;
+			virtual bool isFriendly();
 	};
 }
 

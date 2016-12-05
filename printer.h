@@ -23,7 +23,14 @@ namespace labb3 {
 			std::string printDead();
 			std::string printHit(std::string targetName, Actor * attacker);
 			std::string printAttacked(std::string attacker, std::string target, std::string weapon);
+			std::string printTalkToActor(Actor * actor);
+			std::string printCantTalkToActor(std::string actorString);
+			std::string printCouldNotFindActorToTalkTo(std::string actorString);
+			std::string printFellDownHole();
+			std::string printActorLeftRoom(Actor* actor);
+			std::string printNoPathAtDirection(std::string direction);
 			std::string printRoomContent(Room * room, std::string command="");
+			std::string printInteractionWithRoom(Player* player, bool isFriendlyRoom);
 			std::string printSearch(bool isDangerousRoom, Room * room);
 			std::string printCommands();
 			std::string printCouldNotUnderstandCommand(std::string command);

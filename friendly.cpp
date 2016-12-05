@@ -12,12 +12,18 @@ namespace labb3{
 		}
 		
 		bool Friendly::action(Actor*){
-			std::cout<<_description<<std::endl;
+			//std::cout<<_description<<std::endl;
 		
 		}
+
+	
 		
 		bool Friendly::move(){
 		
+		}
+
+		bool Friendly::isFriendly(){
+			return true;
 		}
 	
 }

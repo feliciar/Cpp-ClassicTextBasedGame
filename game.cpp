@@ -13,28 +13,30 @@
 namespace labb3{
 
 	Game::Game(): _player(Player(20, "gloves")){
-		
 	}
 	
 	Game::~Game(){
 
 	
 		for(Room* room : _rooms){
-	
 			delete room;
+			room = 0;
 		}
-		
-		delete _item;
-		delete _printer;
+		if(_item)
+			delete _item;
+		if(_printer)
+			delete _printer;
+
+		_printer = 0;
+		_item = 0;
 		
 	}
 	
 	bool Game::init(){
-
+		Player p(20, "gloves");
+		_player = p;
 		_printer = new Printer();
-
 		_item = new ItemFile();
-		
 		WorldData* w = new WorldData();
 		_currentRoom = w->initWorld(&_rooms, &_player, &_disapearingDoor);
 
@@ -228,18 +230,17 @@ namespace labb3{
 			if(actor->getName().compare("player")==0){
 				if(next==_disapearingDoor.second && _currentRoom==_disapearingDoor.first){
 					next->removeDoor(_currentRoom);
-					_eventDescriptions.append("You fell down a hole, and you can't get back up. ");
+					_eventDescriptions.append(_printer->printFellDownHole());
 				}
 				_currentRoom = next; 
 				Player* p = dynamic_cast<Player*>(actor);
 			} else {
-				_eventDescriptions.append(actor->getName());
-				_eventDescriptions.append(" left the area.");
+				_eventDescriptions.append(_printer->printActorLeftRoom(actor));
 			}
 			return true;
 		}else {
 			if(actor->getName().compare("player")==0)
-				_eventDescriptions.append("No path here");
+				_eventDescriptions.append(_printer->printNoPathAtDirection(direction));
 			return false;	
 		}
 	}
@@ -329,6 +330,7 @@ namespace labb3{
 	
 	bool Game::sleep(std::string stuff){
 		_currentRoom->interact(&_player);
+		_eventDescriptions.append(_printer->printInteractionWithRoom(&_player, _currentRoom->isFriendly()));
 	}
 	
 	bool Game::talkTo(std::string text, Actor* actor){
@@ -336,14 +338,11 @@ namespace labb3{
 		Friendly* f = dynamic_cast<Friendly*>(a);
 		if(f!=nullptr){
 			f->action(actor);
+			_eventDescriptions.append(_printer->printTalkToActor(f));
 		} else if(a!=nullptr) {
-			std::stringstream s;
-			s<<"Can't talk to "<<text<<"."<<std::endl;
-			_eventDescriptions.append(s.str());
+			_eventDescriptions.append(_printer->printCantTalkToActor(text));
 		} else {
-			std::stringstream s;
-			s<<"Can't find a "<<text<<" to talk to."<<std::endl;
-			_eventDescriptions.append(s.str());	
+			_eventDescriptions.append(_printer->printCouldNotFindActorToTalkTo(text));	
 		}
 	}
 	
@@ -455,7 +454,7 @@ namespace labb3{
 int main(){
 		labb3::Game game;
 		game.init();
-		std::cout<<game.printScreen();
+		std::cout<<game.printWelcome();
 		game.clearScreen();
 		std::string command = "";
 		command = game.readCommand();
@@ -463,16 +462,31 @@ int main(){
 			if(game.performCommand(command, game.getPlayer()) && command.substr(0, 2).compare("go")!=0){
 				game.update();
 			}
-			if(game.win) break;
-			std::cout<<game.printScreen();
-			std::cout<<game.printEvents();
-			game.clearScreen();
-			command = game.readCommand();
+			if(game.win){
+				if(game.win){
+					std::cout<<"You are the coolest! You defeated the great dragon. You are winner!!! "<<std::endl;
+					std::cout<<"Do you want to restart? Type: y or n "<<std::endl;
+					getline (std::cin, command);
+					if(command.compare("y")==0){
+						game.init();
+						std::cout<<game.printWelcome();
+						game.clearScreen();
+						std::string command = "";
+						command = game.readCommand();
+						game.win=false;
+					}else{
+						break;
+					}
+				} 
+			} else{
+				std::cout<<game.printScreen();
+				std::cout<<game.printEvents();
+				game.clearScreen();
+				command = game.readCommand();
+			}
 		}
-		if(game.win){
-			std::cout<<"You are the coolest! You defeated the great dragon. You are winner!!! "<<std::endl;
-			getline (std::cin, command);
-		}  
+		
 		std::cout<<"Bye bye!"<<std::endl;
+		getline (std::cin, command);
 }
 	

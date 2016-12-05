@@ -26,6 +26,7 @@ namespace labb3{
 		Room(std::string);
 		virtual ~Room();
 		virtual bool interact(Actor* player) = 0;
+		virtual bool isFriendly() = 0;
 		std::string printContent(std::string="")const;
 		std::string getDescription()const;
 		Room* getConnectedRoom(int)const;

@@ -38,12 +38,15 @@ namespace labb3{
 	}
 	
 	bool DangerousRoom::interact(Actor* _player){
-		std::cout<<"You are trying to sleep in a dangerous place. Twisting and turning, you can be struck at any time. "<<std::endl;
 		return true;
 	}
 	
 	int DangerousRoom::getDamage()const{
 		return _damage;
+	}
+
+	bool DangerousRoom::isFriendly(){
+		return false;
 	}
 
 

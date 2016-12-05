@@ -11,6 +11,7 @@ namespace labb3{
 		virtual ~DangerousRoom();
 		virtual bool interact(Actor* player);
 		int getDamage()const;
+		virtual bool isFriendly();
 	};
 	
 }

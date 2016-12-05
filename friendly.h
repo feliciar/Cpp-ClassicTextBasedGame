@@ -10,6 +10,7 @@ namespace labb3 {
 		virtual ~Friendly();
 		virtual bool action(Actor*);
 		virtual bool move();
+		virtual bool isFriendly();
 	
 	};
 }

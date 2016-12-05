@@ -42,12 +42,15 @@ namespace labb3{
 	
 	bool FriendlyRoom::interact(Actor* player){
 		Dangerous* d = dynamic_cast<Dangerous*>(player);
-			if(d!=nullptr){
-				int healthAdded = d->replenishHealth(_healingPower);
-				std::cout<<"You slept in safety. Your health was replenished to "<<healthAdded<<" life points. "<<std::endl;
-				return true;
-			}
+		if(d!=nullptr){
+			int healthAdded = d->replenishHealth(_healingPower);
+			return true;
+		}
 		return false; 
+	}
+
+	bool FriendlyRoom::isFriendly(){
+		return true;
 	}
 
 }

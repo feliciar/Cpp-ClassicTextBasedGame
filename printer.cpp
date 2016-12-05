@@ -3,6 +3,7 @@
 #include <sstream>
 #include <windows.h>
 #include <locale>
+#include <math.h>
 
 namespace labb3{
 
@@ -15,17 +16,14 @@ namespace labb3{
 
 	std::string Printer::printWelcome(const Player * player, Room * currentRoom){
 		_numPrintedLines = 0;
-		std::string string = printPlayer(player);
-		_numPrintedLines += findNumberOfLines(string);
+		std::string string = printScreen(player, currentRoom);
 		string.append("\nWelcome! \n");
 		string.append("With no recollection of where you are or who you are,\n");
 		string.append("you hear a distant roar to the north. \n");
 		
 		string.append("If you are confused just say 'help', or try to go somewhere. \n");
-		std::string roomInfo = currentRoom->printContent();
-		string.append(roomInfo);
 
-		_numPrintedLines += 6 + findNumberOfLines(roomInfo);
+		_numPrintedLines += 5;
 		return string;
 	}
 
@@ -43,9 +41,7 @@ namespace labb3{
 		++_numPrintedLines;
 		
 		std::string playerInfo = printPlayer(player);
-		playerInfo.append("\n");
 		string.append(playerInfo);
-		_numPrintedLines += findNumberOfLines(playerInfo);
 
 		string.append(this->printWorld(player));
 
@@ -97,9 +93,52 @@ namespace labb3{
 
 	std::string Printer::printPlayer(const Player * player){
 		Weapon* wep = dynamic_cast<Weapon*>(ItemFile::getItems().find(player->getWeapon())->second);
+		
+		int numLines = 6;
+		std::string strings[numLines];
+		strings[0] = " __________________ __________________ ";
+		strings[1] = "|      8, You      |      Weapon      |";
+		strings[2] = "|      ------      |      ------      |";
+		strings[3] = "|   Health   XP    |   Name   Damage  |";
 		std::stringstream descStream;
-		descStream<<player->getLife()<<"/"<<player->getMaxHealth()<<" <3 "<<" \t"<<player->getXP()<<" XP"<<" \t\tWEAPON: "<<*wep;
-		return descStream.str();
+		
+		double spaces = 9-std::to_string(player->getLife()).size()-1-std::to_string(player->getMaxHealth()).size();
+		int spacesBefore = ceil(spaces/2.0);
+		std::string s0(spacesBefore, ' ');
+		int spacesAfter = floor(spaces/2.0);
+		std::string s1(spacesAfter, ' ');
+		spaces = 9-std::to_string(player->getXP()).size();
+		spacesBefore = ceil(spaces/2.0);
+		std::string s2(spacesBefore, ' ');
+		spacesAfter = floor(spaces/2.0);
+		std::string s3(spacesAfter, ' ');
+		descStream<< "|"<<s0<<player->getLife()<<"/"<<player->getMaxHealth()<<s1;
+		descStream<<s2<<player->getXP()<<s3<<"|";
+		//Print weapon
+		std::string weaponStr = wep->getName();
+		spaces = 9-weaponStr.size();
+		spacesBefore = ceil(spaces/2.0);
+		std::string s4(spacesBefore, ' ');
+		spacesAfter = floor(spaces/2.0);
+		std::string s5(spacesAfter, ' ');
+		weaponStr = wep->getDamage();
+		spaces = 9-weaponStr.size();
+		spacesBefore = ceil(spaces/2.0);
+		std::string s6(spacesBefore, ' ');
+		spacesAfter = floor(spaces/2.0);
+		std::string s7(spacesAfter, ' ');
+		descStream<<s4<<wep->getName()<<s5<<s6<<wep->getDamage()<<s7<<"|";
+		strings[4] = descStream.str();
+		strings[5] = " ------------------ ------------------";
+
+
+		std::string str = "";
+		for(int i =0; i<numLines; ++i){
+			str.append(strings[i]);
+			str.append("\n");
+		}
+		_numPrintedLines += numLines;
+		return str;
 	}
 
 	std::string Printer::printPickedUpWeapon(Actor * actor, std::string item, std::string oldWeapon){
@@ -108,8 +147,9 @@ namespace labb3{
 			//descStream<<"You picked up "<<item<<" and left behind your old "<<oldWeapon<<std::endl;
 		} else {
 			descStream<<actor->getName()<<" picked up "<<item<<" and left behind it's old "<<oldWeapon<<std::endl;
+			_numPrintedLines += 1;
 		}
-		_numPrintedLines += 1;
+		
 		return descStream.str();
 	}
 
@@ -154,9 +194,49 @@ namespace labb3{
 		}
 		else if ( target.compare("player")!=0){
 			s<<attacker<<" attacked "<<target<<" with "<<weapon<<std::endl;
+			++_numPrintedLines;
 		}
-		++_numPrintedLines;
 		return s.str();
+	}
+
+	std::string Printer::printTalkToActor(Actor * actor){
+		_numPrintedLines++;
+		std::string s = actor->getDescription();
+		s.append("\n");
+		return s;
+	}
+
+	std::string Printer::printCantTalkToActor(std::string actorString){
+		std::stringstream s;
+		s<<"Can't talk to "<<actorString<<"."<<std::endl;
+		_numPrintedLines++;
+		return s.str();
+	}
+
+	std::string Printer::printCouldNotFindActorToTalkTo(std::string actorString){
+		std::stringstream s;
+		s<<"Can't find a "<<actorString<<" to talk to."<<std::endl;
+		_numPrintedLines++;
+		return s.str();
+	}
+
+	std::string Printer::printFellDownHole(){
+		_numPrintedLines++;
+		return "You fell down a hole, and you can't get back up. \n";
+	}
+
+	std::string Printer::printActorLeftRoom(Actor* actor){
+		std::stringstream s;
+		s<<actor->getName()<<" left the area.\n";
+		_numPrintedLines++;
+		return s.str();
+	}
+
+	std::string Printer::printNoPathAtDirection(std::string direction){
+		std::string s = "There is no path to the ";
+		s.append(direction);
+		_numPrintedLines++;
+		return s;
 	}
 
 	std::string Printer::printRoomContent(Room * room, std::string command){
@@ -164,6 +244,17 @@ namespace labb3{
 		roomInfo.append("\n");
 		_numPrintedLines += findNumberOfLines(roomInfo);
 		return roomInfo;
+	}
+
+	std::string Printer::printInteractionWithRoom(Player * player, bool roomIsFriendly){
+		Dangerous* d = dynamic_cast<Dangerous*>(player);
+		if(d!=nullptr && roomIsFriendly){
+			_numPrintedLines++;
+			return "You slept in safety. Your health was replenished.\n";
+		}else if( ! roomIsFriendly ){
+			_numPrintedLines++;
+			return "You are trying to sleep in a dangerous place. Twisting and turning, you can be struck at any time. \n";
+		}
 	}
 
 	std::string Printer::printSearch(bool isDangerousRoom, Room * room){

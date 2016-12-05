@@ -106,6 +106,12 @@ namespace labb3 {
 	std::string Dangerous::getWeapon()const{
 		return _weapon;
 	}
+
+	bool Dangerous::isFriendly(){
+			return false;
+	}
+
+
 }
 
 

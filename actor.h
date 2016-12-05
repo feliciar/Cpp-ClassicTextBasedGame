@@ -20,6 +20,7 @@ namespace labb3 {
 			void setName(std::string name);
 			void setDescription(std::string desc);
 			void setHidden(bool hidden);
+			virtual bool isFriendly() = 0; 
 
 	};
 	
